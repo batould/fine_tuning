@@ -1,3 +1,6 @@
 [submodule "finetuning_preprocessor"]
 	path = finetuning_preprocessor
 	url = https://github.com/MariusTacke/finetuning_preprocessor.git
+[submodule "finetuning_trainer"]
+	path = finetuning_trainer
+	url = https://github.com/MariusTacke/finetuning_trainer.git
