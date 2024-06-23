@@ -3,7 +3,6 @@ import numpy as np
 import math 
 import pandas as pd
 import csv
-#from configurations import _set_config_generate
 
 
 class DummyRegressor():
@@ -67,15 +66,24 @@ class DummyRegressor():
         for input, output in zip(input,output):
             text.append(f'Input = {input} Output = {output}')
         return text
+    
+    
+    def save_data(self):
+        config = os.getcwd()      
+        file_name = os.path.join(config, "generate_data", "dataset.csv") 
+        text = self.generate_dic()
+        with open(file_name, 'w', newline='') as file:
+            writer = csv.writer(file)
+            for example in text:
+                writer.writerow([example])
                   
     
 if __name__ == "__main__":
     k = 3
-    size_train = 7
-    size_test = 10
-    model  = 'llama'
-    function = 2
+    size_train = 500
+    size_test = 100
+    function = 1
     regressor = DummyRegressor(k = k, size_train = size_train, size_test = size_test)
-    text = regressor.generate_dic()
+    text = regressor.save_data()
     
     

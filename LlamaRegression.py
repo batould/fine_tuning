@@ -45,11 +45,12 @@ class LlamaForMaskedLLM(PreTrainedModel):
         if labels is not None: 
             mask_token_id = self.tokenizer.convert_tokens_to_ids(self.tokenizer.mask_token)
             mask_positions = (input_ids == mask_token_id).nonzero(as_tuple=True)
-            print(f'Masked id{mask_token_id}')
-            print(f'Masked_positions{mask_positions}')
-            masked_regression_scores = regression_scores[mask_positions]
-            masked_regression_labels =labels[mask_positions[0]]            
-            regression_loss = nn.MSELoss()(masked_regression_scores, masked_regression_labels)
-            regression_loss = regression_loss.mean()
-            print(f'Regression loss is{regression_loss}')
+            if mask_positions[0].size(0) > 0:
+                masked_regression_scores = regression_scores[mask_positions]
+                masked_regression_labels =labels[mask_positions[0]]            
+                regression_loss = nn.MSELoss()(masked_regression_scores, masked_regression_labels)
+                regression_loss = regression_loss.mean()
+            else:
+                regression_loss = torch.tensor(0.0, device=input_ids.device, requires_grad=True)
+                
         return (regression_loss, regression_scores) if regression_loss is not None else regression_scores

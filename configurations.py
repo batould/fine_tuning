@@ -77,6 +77,12 @@ def _set_azure_config():
 
 def _set_huggingface_config():
     huggingface_config = {
-        "checkpoint": "meta-llama/Meta-Llama-3-8B-Instruct" # "mistralai/Mistral-7B-Instruct-v0.2" #"meta-llama/Llama-2-7b-chat-hf"#
+        "checkpoint": "meta-llama/Meta-Llama-3-8B-Instruct" ,# "mistralai/Mistral-7B-Instruct-v0.2" #"meta-llama/Llama-2-7b-chat-hf"#,
+        "cache_dir" : os.path.join('/','work', 'kwm', 'cbd8159', 'cache_huggingface'),
+        "output_dir": os.path.join("output"),
+        "logging_dir": os.path.join("output", "logging"),
+        "save_model": os.path.join("output", "trained_models"),
+        "tokenizer_path": os.path.join("fine_tune", "src", "tokenizer"),
+        "tuning_dataset": os.path.join("generate_data", "dataset.csv")
     }
     return huggingface_config
