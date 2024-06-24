@@ -1,3 +1,4 @@
+#%%
 from datasets import Dataset
 from transformers import Trainer, TrainingArguments, LlamaTokenizer, BitsAndBytesConfig
 from LlamaRegression import LlamaForMaskedLLM
@@ -66,7 +67,7 @@ def save_test_data(tokenize_test):
     with open('tokenize_test.pkl', 'wb') as f:
         pickle.dump(tokenize_test, f)
 
-
+#%%
 # Get model, tokenizer, bnb
 tokenizer = LlamaTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf",  token=access_token)
 tokenizer.pad_token = tokenizer.eos_token
@@ -74,7 +75,7 @@ tokenizer.pad_token = tokenizer.eos_token
 if tokenizer.mask_token is None:
     tokenizer.add_special_tokens({'mask_token': '[MASK]'})   
   
-    
+#%%
 bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16) #not sure if 16 or 32
 model = LlamaForMaskedLLM.from_pretrained("meta-llama/Llama-2-7b-hf", token=access_token, tokenizer= tokenizer, quantization_config=bnb_config)
 model.resize_token_embeddings(len(tokenizer))
@@ -90,7 +91,7 @@ config =  LoraConfig( r=16,
     bias="none")
 
 model = get_peft_model(model, peft_config=config)
-
+#%%
 # Get the data for function 1
 text = get_dataset(dataset_path)
 data = {'text': text}
@@ -106,7 +107,14 @@ tokenize_test.set_format(type='torch', columns=['input_ids', 'attention_mask', '
 tokenize_train = masked_train_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
 tokenize_train.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
 save_test_data(tokenize_test=tokenize_test)
+#%%
+def load_test_data():
+    with open('tokenize_test.pkl', 'rb') as f:
+        tokenize_test = pickle.load(f)
+    return tokenize_test
 
+tokenize_test = load_test_data()
+#%%
 training_args = TrainingArguments(
     output_dir= hugging_config["output_dir"],
     num_train_epochs=3,

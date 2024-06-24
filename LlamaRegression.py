@@ -38,6 +38,8 @@ class LlamaForMaskedLLM(PreTrainedModel):
 
         outputs = self.model(input_ids, attention_mask=attention_mask)
         sequence_output = outputs.last_hidden_state 
+        #sequence_output = sequence_output.to(next(self.regression_head.parameters()).dtype)
+
         
         regression_scores = self.regression_head(sequence_output).squeeze(-1)  # Regression predictions
 

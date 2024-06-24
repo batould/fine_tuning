@@ -11,7 +11,8 @@ import re
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 import os
 import csv
-import pickle
+import numpy as np
+
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 access_token = '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'
@@ -29,8 +30,8 @@ def get_dataset(file_path):
         for sample in reader:
             text.append(sample[0])
     return text
-    
-    
+
+
 def mask_output(example):
     pattern = r'(?i)output\s*=\s*(-?\d+(\.\d+)?)'
     match = re.search(pattern, example['text'])
@@ -54,6 +55,7 @@ def randomly_mask_dataset(dataset, mask_probability=0.15):
 def tokenize_function(samples):
     tokenized_samples = tokenizer(samples['text'], truncation=True, padding="max_length", max_length=128, return_tensors="pt")
     tokenized_samples.to(device)
+    input_ids = tokenized_samples['input_ids']
     
     if 'true_value' in samples:
         true_values = samples['true_value']
@@ -64,20 +66,16 @@ def tokenize_function(samples):
     return tokenized_samples
 
 
-def save_test_data(tokenize_test):
-    with open('tokenize_test.pkl', 'wb') as f:
-        pickle.dump(tokenize_test, f)
-
-
 # Get model, tokenizer, bnb
 tokenizer = LlamaTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf",  token=access_token)
 tokenizer.pad_token = tokenizer.eos_token
 
 if tokenizer.mask_token is None:
-    tokenizer.add_special_tokens({'mask_token': '[MASK]'})   
-  
+    tokenizer.add_special_tokens({'mask_token': '[MASK]'})
     
 bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16) #not sure if 16 or 32
+
+# Get model ready with toknization
 model = LlamaForMaskedLLM.from_pretrained("meta-llama/Llama-2-7b-hf", token=access_token, tokenizer= tokenizer, quantization_config=bnb_config)
 model.resize_token_embeddings(len(tokenizer))
 model.enable_gradient_checkpointing()
@@ -90,13 +88,12 @@ config =  LoraConfig( r=16,
     target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     lora_dropout=0.1,
     bias="none")
-
 model = get_peft_model(model, peft_config=config)
 
-# Get the data for function 1
 text = get_dataset(dataset_path)
 data = {'text': text}
-data["true_value"] = [0.0 for _ in range(len(data["text"]))]
+data["true_value"] = [0.0 for _ in range(len(data["text"]))] 
+
 dataset = Dataset.from_dict(data) #dataset = ({features: ['text'], num_rows:25})
 dataset = dataset.train_test_split(test_size=0.3) #dataset = ({train:Dataset({}), test:Dataset})
 masked_train_dataset = randomly_mask_dataset(dataset['train'])
@@ -107,7 +104,7 @@ tokenize_test = masked_test_dataset.map(tokenize_function, batched=True, remove_
 tokenize_test.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
 tokenize_train = masked_train_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
 tokenize_train.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
-save_test_data(tokenize_test=tokenize_test)
+
 
 training_args = TrainingArguments(
     output_dir= hugging_config["output_dir"],
@@ -135,14 +132,10 @@ trainer = Trainer(
 
 # Train the model
 trainer.train()
-model.eval()
-    
-model.save_pretrained(hugging_config["save_model"])
-tokenizer.save_pretrained(hugging_config["save_model"])
-print("Model and tokenizer saved successfully.")
-
+model.eval()   
 test_dataloader = DataLoader(tokenize_test, batch_size=5)
 mask_token_id = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
+print(f'Mask token id is {mask_token_id}')
 results = []
 mse_loss_fn = nn.MSELoss(reduction="mean")
 
@@ -188,4 +181,9 @@ for result in results:
     print(f"Masked indices: {result['masked_indices']}")
     print(f"Predicted values: {result['predicted_values']}")
     print(f"MSE: {result['mse']}")
-    print(f"True values: {result['true_values']}")           
+    print(f"True values: {result['true_values']}") 
+
+
+mse_values = [result['mse'] for result in results]
+mean_mse = np.nanmean(mse_values)
+print(f'Mean mse i s{mean_mse}')          

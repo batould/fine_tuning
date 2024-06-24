@@ -28,7 +28,7 @@ def load_test_data():
 model = LlamaForMaskedLLM.from_pretrained(hugging_config["save_model"])
 tokenizer = LlamaTokenizer.from_pretrained(hugging_config["save_model"])
 
-tokenize_test= load_test_data()
+tokenize_test = load_test_data()
 test_dataloader = DataLoader(tokenize_test, batch_size=5)
 mask_token_id = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
 
