@@ -1,8 +1,9 @@
-#%%
 from datasets import Dataset
 from transformers import Trainer, TrainingArguments, LlamaTokenizer, BitsAndBytesConfig
+import torch.nn as nn
 from LlamaRegression import LlamaForMaskedLLM
 from huggingface_hub import login
+from torch.utils.data import DataLoader
 import random
 import torch
 from configurations import _set_huggingface_config
@@ -11,6 +12,7 @@ from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 import os
 import csv
 import pickle
+from accelerate import Accelerator
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 access_token = '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'
@@ -64,10 +66,12 @@ def tokenize_function(samples):
 
 
 def save_test_data(tokenize_test):
-    with open('tokenize_test.pkl', 'wb') as f:
+    file_path = hugging_config["evaluate_dataset"]
+    tokenize_test_path = os.path.join(file_path, "tokenize_test.pkl")
+    with open(tokenize_test_path, 'wb') as f:
         pickle.dump(tokenize_test, f)
 
-#%%
+
 # Get model, tokenizer, bnb
 tokenizer = LlamaTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf",  token=access_token)
 tokenizer.pad_token = tokenizer.eos_token
@@ -75,9 +79,9 @@ tokenizer.pad_token = tokenizer.eos_token
 if tokenizer.mask_token is None:
     tokenizer.add_special_tokens({'mask_token': '[MASK]'})   
   
-#%%
+    
 bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16) #not sure if 16 or 32
-model = LlamaForMaskedLLM.from_pretrained("meta-llama/Llama-2-7b-hf", token=access_token, tokenizer= tokenizer, quantization_config=bnb_config)
+model = LlamaForMaskedLLM.from_pretrained("meta-llama/Llama-2-7b-hf", token=access_token, tokenizer=tokenizer, quantization_config=bnb_config)
 model.resize_token_embeddings(len(tokenizer))
 model.enable_gradient_checkpointing()
 model.supports_gradient_checkpointing= True
@@ -91,32 +95,35 @@ config =  LoraConfig( r=16,
     bias="none")
 
 model = get_peft_model(model, peft_config=config)
-#%%
+mask_token_id = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
+
 # Get the data for function 1
 text = get_dataset(dataset_path)
 data = {'text': text}
 data["true_value"] = [0.0 for _ in range(len(data["text"]))]
+
 dataset = Dataset.from_dict(data) #dataset = ({features: ['text'], num_rows:25})
 dataset = dataset.train_test_split(test_size=0.3) #dataset = ({train:Dataset({}), test:Dataset})
-masked_train_dataset = randomly_mask_dataset(dataset['train'])
+dataset_train_validate = dataset.train_test_split(test_size=0.3)
+masked_train_dataset = randomly_mask_dataset(dataset_train_validate['train'])
+masked_validate_dataset = randomly_mask_dataset(dataset_train_validate['test'])
 masked_test_dataset = randomly_mask_dataset(dataset['test'])
 
 # Tokenize the datasets
 tokenize_test = masked_test_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
 tokenize_test.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
+
 tokenize_train = masked_train_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
 tokenize_train.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
-save_test_data(tokenize_test=tokenize_test)
-#%%
-def load_test_data():
-    with open('tokenize_test.pkl', 'rb') as f:
-        tokenize_test = pickle.load(f)
-    return tokenize_test
 
-tokenize_test = load_test_data()
-#%%
+tokenize_validate= masked_validate_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
+tokenize_validate.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
+save_test_data(tokenize_test=tokenize_test)
+
+
 training_args = TrainingArguments(
     output_dir= hugging_config["output_dir"],
+    overwrite_output_dir=True,
     num_train_epochs=3,
     per_device_train_batch_size=1,
     gradient_accumulation_steps=4,
@@ -126,8 +133,7 @@ training_args = TrainingArguments(
     fp16=False,
     optim="paged_adamw_8bit",
     learning_rate=2e-5,
-    weight_decay=0.01
-    
+    weight_decay=0.01    
 )
 
 # Trainer setup
@@ -135,14 +141,13 @@ trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenize_train,
-    eval_dataset=tokenize_test,
+    eval_dataset=tokenize_validate,
     tokenizer=tokenizer    
 )
 
 # Train the model
 trainer.train()
-model.eval()
-    
-model.save_pretrained(hugging_config["save_model"])
+
+trainer.save_model(hugging_config["save_model"])
 tokenizer.save_pretrained(hugging_config["save_model"])
 print("Model and tokenizer saved successfully.")

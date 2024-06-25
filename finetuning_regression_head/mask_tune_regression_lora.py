@@ -96,26 +96,32 @@ data["true_value"] = [0.0 for _ in range(len(data["text"]))]
 
 dataset = Dataset.from_dict(data) #dataset = ({features: ['text'], num_rows:25})
 dataset = dataset.train_test_split(test_size=0.3) #dataset = ({train:Dataset({}), test:Dataset})
-masked_train_dataset = randomly_mask_dataset(dataset['train'])
+dataset_train_validate = dataset.train_test_split(test_size=0.3)
+masked_train_dataset = randomly_mask_dataset(dataset_train_validate['train'])
+masked_validate_dataset = randomly_mask_dataset(dataset_train_validate['test'])
 masked_test_dataset = randomly_mask_dataset(dataset['test'])
 
 # Tokenize the datasets
 tokenize_test = masked_test_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
 tokenize_test.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
+
 tokenize_train = masked_train_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
 tokenize_train.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
+
+tokenize_validate= masked_validate_dataset.map(tokenize_function, batched=True, remove_columns=["text","true_value"])
+tokenize_validate.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
 
 
 training_args = TrainingArguments(
     output_dir= hugging_config["output_dir"],
-    num_train_epochs=3,
+    num_train_epochs=3, 
     per_device_train_batch_size=1,
     gradient_accumulation_steps=4,
     evaluation_strategy='epoch',
     save_strategy='epoch',
     logging_dir=hugging_config["logging_dir"],
     fp16=False,
-    optim="paged_adamw_8bit",
+    optim="paged_adamw_8bit", # try 4bit
     learning_rate=2e-5,
     weight_decay=0.01
     
@@ -126,7 +132,7 @@ trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenize_train,
-    eval_dataset=tokenize_test,
+    eval_dataset=tokenize_validate,
     tokenizer=tokenizer    
 )
 

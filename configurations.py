@@ -86,3 +86,32 @@ def _set_huggingface_config():
         "tuning_dataset": os.path.join("generate_data", "dataset.csv")
     }
     return huggingface_config
+
+def _set_config_preprocessor():
+    configuration = {
+        "input_dir" : os.path.join(os.getcwd(), "finetuning_preprocessor", "input"),
+        "output_dir": os.path.join(os.getcwd(), "finetuning_preprocessor", "output"),
+        "training_data_file_name":   "training_data",
+        "validation_data_file_name": "validation_data",
+        "test_data_file_name":       "test_data",
+        "input_features":            1,
+        "output_features":           1,
+        "samples_per_batch":         5,
+    }
+    return configuration
+    
+    
+def _set_config_trainer():
+    configuration = {
+        "checkpoint":               "meta-llama/Llama-2-7b-hf",
+        "input_dir":                 os.path.join(os.getcwd(), "finetuning_preprocessor", "output"),
+        "output_dir":               os.path.join("output_tune_model", "output"),
+        "logging_dir":              os.path.join("output_tune_model", "logging"),
+        "cache_dir":                os.path.join("output_tune_model", "huggingface_cache"),
+        "training_input_file":      "training_prompts_and_targets",
+        "validation_input_file":    "validation_prompts_and_targets",
+        "test_input_file":          "test_prompts_and_targets",
+        "evaluation_metric":        "mae",
+        "evaluate_metric_rescaled": True,
+    }
+    return configuration

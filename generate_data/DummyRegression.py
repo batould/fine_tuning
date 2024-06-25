@@ -11,7 +11,7 @@ class DummyRegressor():
         CSV file then saved in data directory 
         data-> raw_data -> csv file
     '''
-    def __init__(self,  size_test, size_train, k):
+    def __init__(self,  size_test, size_train, size_validate, k):
         '''
             k: defines the constant
             size_train: size of training data
@@ -20,6 +20,8 @@ class DummyRegressor():
         self.k = k 
         self.size_train = size_train 
         self.size_test = size_test
+        self.size_validate = size_validate
+        self.total_samples = size_test + size_train + size_validate
     
     
     def set_directory (self, destination):
@@ -33,10 +35,9 @@ class DummyRegressor():
     
     
     def generate_data(self):
-        input = np.random.randint(-100,100, (self.size_test + self.size_train))
-        #output = ((self.k * input)**2 + np.sqrt(self.k/self.split_rate) + (self.size*(input)**3))** (1/self.size)
-        output = np.sin(input) + self.k* np.cos(input**2)
-        #output = np.sin(input**2) + self.k * np.cos(input**2) + np.cbrt(np.pi**self.k)
+        input = np.random.randint(-100,100, (self.total_samples))
+        output = np.sin(input) + self.k* np.cos(input**2) # function1
+        #output = np.sin(input**2) + self.k * np.cos(input**2) + np.cbrt(np.pi**self.k) # function2 
      
         return input,output
     
@@ -44,8 +45,9 @@ class DummyRegressor():
     def split_data(self):
         [input,output] = self.generate_data()
         train_data = np.stack([input[0:self.size_train], output[0:self.size_train]]).reshape(2,-1)
-        test_data = np.stack([input[self.size_train:], output[self.size_train:]]).reshape(2,-1)
-        return [train_data,test_data]
+        test_data = np.stack([input[self.size_train:self.size_test+self.size_train], output[self.size_train:self.size_test+self.size_train]]).reshape(2,-1)
+        validate_data = np.stack([input[self.size_test+self.size_train: ], output[self.size_test+self.size_train:]]).reshape(2,-1)
+        return [train_data, test_data, validate_data]
         
     
     def save_output(self, directory, data, file_name):
@@ -54,12 +56,16 @@ class DummyRegressor():
         dataframe.to_csv(directory + f'/{file_name}', index = False)
         
         
-    def generate_output(self, model, function):
-        train_data,test_data = self.split_data()
+    def generate_output(self, input_dir):
+        train_data, test_data, validate_data = self.split_data()
         #directory_input = _set_config_generate(function, model)["input_dir"]
         #regressor.save_output(directory_input, train_data, _set_config_generate(function, model)['training_data_file_name']+'.csv')
         #regressor.save_output(directory_input, test_data, _set_config_generate(function, model)['test_data_file_name']+'.csv')
-    
+        self.save_output(input_dir, train_data, 'training_data.csv' )
+        self.save_output(input_dir, test_data, 'test_data.csv' )
+        self.save_output(input_dir, validate_data, 'validation_data.csv' )
+        
+        
     def generate_dic(self):
         [input,output] = self.generate_data()
         text = []
@@ -80,10 +86,12 @@ class DummyRegressor():
     
 if __name__ == "__main__":
     k = 3
-    size_train = 500
-    size_test = 100
+    size_train = 5000
+    size_test = 1000
+    size_validate = 1000
     function = 1
-    regressor = DummyRegressor(k = k, size_train = size_train, size_test = size_test)
-    text = regressor.save_data()
-    
+    input_dir = os.path.join(os.getcwd(), "finetuning_preprocessor", "input")
+    regressor = DummyRegressor(k = k, size_train = size_train, size_test = size_test, size_validate=size_validate)
+    #text = regressor.save_data()
+    regressor.generate_output(input_dir=input_dir)
     
