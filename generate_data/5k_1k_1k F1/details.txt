@@ -1,0 +1,2 @@
+Tune dataset is 7k 5k went for training and 2k went for evaluation
+Test set was set to 1k 

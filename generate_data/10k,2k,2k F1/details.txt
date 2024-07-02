@@ -1,0 +1,2 @@
+tune dataset was set to 12k, 10 k for train and 2k for validate 
+test was only 2k
