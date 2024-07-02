@@ -1,4 +1,3 @@
-import pickle
 from LlamaRegression import LlamaForMaskedLLM
 from transformers import LlamaTokenizer, BitsAndBytesConfig
 from configurations import _set_huggingface_config
@@ -9,54 +8,69 @@ from huggingface_hub import login
 import numpy as np
 import os
 from peft import PeftModel
+import csv 
+from TokenizeDataset import TokenizeDataset
+from datasets import Dataset
+import hashlib
+
+
+def get_dataset(file_path):
+    text = []
+    with open (file_path, 'r', newline='') as file:
+        reader = csv.reader(file)
+        for sample in reader:
+            text.append(sample[0])
+    return text
+
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 access_token = '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'
 login(token=access_token)
-hugging_config = _set_huggingface_config()
-dataset_path = hugging_config["tuning_dataset"]
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.cuda.empty_cache()
 
-
-def load_test_data():
-    file_path = hugging_config["evaluate_dataset"]
-    tokenize_test_path = os.path.join(file_path, "tokenize_test.pkl")
-    with open(tokenize_test_path, 'rb') as f:
-        tokenize_test = pickle.load(f)
-    return tokenize_test
-
-
+hugging_config = _set_huggingface_config()
+dataset_path = hugging_config["evaluate_dataset"]
 model_directory = hugging_config["save_model"]
+
 tokenizer = LlamaTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf",  token=access_token)
+bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16) 
 tokenizer.pad_token = tokenizer.eos_token
 
-if tokenizer.mask_token is None:
-    tokenizer.add_special_tokens({'mask_token': '[MASK]'})   
-  
-
-bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16) 
+if tokenizer.mask_token is None: tokenizer.add_special_tokens({'mask_token': '[MASK]'})   
+ 
 model = LlamaForMaskedLLM.from_pretrained("meta-llama/Llama-2-7b-hf", token=access_token, tokenizer=tokenizer, quantization_config=bnb_config)
 model.resize_token_embeddings(len(tokenizer))
 model = PeftModel.from_pretrained(model, model_directory)
 
-    
-tokenize_test= load_test_data()
+with open(os.path.join(model_directory, "model_hash.txt"), "r") as f:
+    saved_model_hash = f.read().strip()
+
+model_config_str = str(model.config)
+model_hash = hashlib.md5(model_config_str.encode()).hexdigest()
+
+assert saved_model_hash == model_hash, "Loaded model configuration does not match the saved model."
+print("Model and tokenizer loaded successfully.")
+print(f"Model configuration hash: {model_hash}")
+
+tokenize_pipieline = TokenizeDataset(tokenizer)
+text = get_dataset(dataset_path) 
+data = {'text': text}
+data["true_value"] = [0.0 for _ in range(len(data["text"]))]
+dataset = Dataset.from_dict(data)
+tokenize_test = tokenize_pipieline.tokenize_data(dataset)
+
 test_dataloader = DataLoader(tokenize_test, batch_size=5)
+mse_loss_fn = nn.MSELoss(reduction="mean")
 mask_token_id = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
 
-model.eval()
 results= []
-mse_loss_fn = nn.MSELoss(reduction="mean")
+model.eval()
 
 for batch in test_dataloader:
     input_ids = batch['input_ids'].to(device)
     attention_mask = batch['attention_mask'].to(device)
-    labels = batch['labels'].to(device).to(torch.float16)
-    print(f'input id is {input_ids.dtype}')
-    print(f'label is {labels.dtype}')
-    print(f'atttnetion is {attention_mask.dtype}')
-    
+    labels = batch['labels'].to(device).to(torch.float16)    
     
     with torch.no_grad():
         output = model(input_ids, attention_mask=attention_mask, labels=labels)
@@ -89,13 +103,12 @@ for batch in test_dataloader:
                 "mse": mse_value
             }
             results.append(result)
-            
+                        
 for result in results:
-    print(f"Input text: {result['input_text']}")
-    print(f"Masked indices: {result['masked_indices']}")
     print(f"Predicted values: {result['predicted_values']}")
-    print(f"MSE: {result['mse']}")
     print(f"True values: {result['true_values']}")
+    print(f"MSE: {result['mse']}")
     
-mean_mse = np.nanmean(results['mse'])
-print(f'Mean mse i s{mean_mse}')  
+mse_values = [result['mse'] for result in results]
+mean_mse = np.nanmean(mse_values)
+print(f'Mean MSE: {mean_mse}')   

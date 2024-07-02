@@ -12,7 +12,7 @@ class LlamaForMaskedLLM(PreTrainedModel):
         self.regression_head = nn.Linear(config.hidden_size, 1)  # Regression head to predict floating-point values
         self.init_weights()
         self.tokenizer = tokenizer
-    
+          
     def resize_token_embeddings(self, new_num_tokens):
         self.model.resize_token_embeddings(new_num_tokens)
         self.regression_head = nn.Linear(self.config.hidden_size, 1).to(self.model.device)
@@ -38,9 +38,8 @@ class LlamaForMaskedLLM(PreTrainedModel):
 
         outputs = self.model(input_ids, attention_mask=attention_mask)
         sequence_output = outputs.last_hidden_state 
-        #sequence_output = sequence_output.to(next(self.regression_head.parameters()).dtype)
+        sequence_output = sequence_output.to(next(self.regression_head.parameters()).dtype)
 
-        
         regression_scores = self.regression_head(sequence_output).squeeze(-1)  # Regression predictions
 
         regression_loss = None
