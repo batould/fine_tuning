@@ -9,7 +9,7 @@ import numpy as np
 import os
 from peft import PeftModel
 import csv 
-from TokenizeDataset import TokenizeDataset
+from TokenizeDataset import TokenizeMaskDataset
 from datasets import Dataset
 import hashlib
 
@@ -53,7 +53,7 @@ assert saved_model_hash == model_hash, "Loaded model configuration does not matc
 print("Model and tokenizer loaded successfully.")
 print(f"Model configuration hash: {model_hash}")
 
-tokenize_pipieline = TokenizeDataset(tokenizer)
+tokenize_pipieline = TokenizeMaskDataset(tokenizer)
 text = get_dataset(dataset_path) 
 data = {'text': text}
 data["true_value"] = [0.0 for _ in range(len(data["text"]))]

@@ -10,7 +10,7 @@ from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 import os
 import csv
 import numpy as np
-from TokenizeDataset import TokenizeDataset
+from TokenizeDataset import TokenizeMaskDataset
 import hashlib
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
@@ -64,7 +64,7 @@ model = get_peft_model(model, peft_config=config)
 mask_token_id = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
 
 # Data - Function 1
-tokenize_pipeline = TokenizeDataset(tokenizer)
+tokenize_pipeline = TokenizeMaskDataset(tokenizer)
 text = get_dataset(dataset_path)
 data = {'text': text}
 data["true_value"] = [0.0 for _ in range(len(data["text"]))]

@@ -35,7 +35,7 @@ class DummyRegressor():
     
     
     def generate_data(self):
-        input = np.random.randint(-1000,1000, (self.total_samples))
+        input = np.random.randint(-100,100, (self.total_samples))
         output = np.sin(input) + self.k* np.cos(input**2) # function1
         #output = np.sin(input**2) + self.k * np.cos(input**2) + np.cbrt(np.pi**self.k) # function2 
      
@@ -61,10 +61,10 @@ class DummyRegressor():
         #directory_input = _set_config_generate(function, model)["input_dir"]
         #regressor.save_output(directory_input, train_data, _set_config_generate(function, model)['training_data_file_name']+'.csv')
         #regressor.save_output(directory_input, test_data, _set_config_generate(function, model)['test_data_file_name']+'.csv')
-        self.save_output(input_dir, train_data, 'training_data.csv' )
+        self.save_output(input_dir, train_data, 'few_shot_data.csv' )
         self.save_output(input_dir, test_data, 'test_data.csv' )
-        self.save_output(input_dir, validate_data, 'validation_data.csv' )
-        
+        #self.save_output(input_dir, validate_data, 'validation_data.csv' )
+        #self.save_output(input_dir, validate_data, 'training_data.csv' )
         
     def generate_dic(self):
         [input,output] = self.generate_data()
@@ -86,9 +86,9 @@ class DummyRegressor():
     
 if __name__ == "__main__":
     k = 3
-    size_train = 10000
-    size_test = 2000
-    size_validate = 1000
+    size_train = 7
+    size_test = 10
+    size_validate = 0
     function = 1
     input_dir = os.path.join(os.getcwd(), "finetuning_preprocessor", "input")
     regressor = DummyRegressor(k = k, size_train = size_train, size_test = size_test, size_validate=size_validate)

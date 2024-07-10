@@ -1,0 +1,121 @@
+{
+"user_few_shot_prompts":
+    {
+        "baseline":
+        {
+            "before_examples": "Calculate the corresponding function output values for the following input values. \n",
+            "after_examples": "Provide the function output values in the given json format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Provide only the final values without any introduction. Do not include \"rad\" or \"degree\" in the output."
+
+        },
+
+        "baseline_context" : 
+        {
+            "before_examples": "Use the following examples to understand the mathematical function that relates the input and the output values.",
+            "after_examples": "Your goal is to calculate the function output values for the following input values. Use the mathematical function that you analyzed from the examples. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" values. Do not include symbolic expression, variables, or formulas in JSON."
+
+        },
+
+
+        "context" : 
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values.",
+            "after_examples": "Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples and based on your theoretical knowledge. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON."
+
+        },
+
+        "input_format" : 
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The exact function type and the exact underlying mathematical function are complex and unknown. Use the examples delimited below to understand the underlying pattern and infer the mathematical function that relates the input and the output values.",
+            "after_examples": "Calculate the corresponding function output values for the following input values. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON."
+
+        },
+
+        "uncertain" : 
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples delimited below to understand the underlying pattern and infer the mathematical function that relates the input and the output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns, and apply this function to the new set of input values.",
+            "after_examples": "Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples and based on your theoretical knowledge. Perform the calculations step by step to avoid calculation errors. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON."
+
+        },
+    
+
+        "reinforce" : 
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The function type and underlying mathematical function are complex and unknown. Use the examples delimited below to understand the underlying pattern and infer the mathematical function that relates the input and the output values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition.",
+            "after_examples": "Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples and based on your theoretical knowledge. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON."
+
+        },
+
+
+        "reinforce_uncertain" : 
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns, and apply this function to the new set of input values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition.",
+            "after_examples": "Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples and based on your theoretical knowledge. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON."
+
+        },
+
+
+        "breakdown_uncertain":
+        {
+            "before_examples":"Provide the function output value of the given input by performing the following tasks step by step:\n1. Analyze the examples delimited below.\n2. Recognize the underlying pattern and infer the underlying mathematical function based on the input-output pair values from the examples.\n3. Apply this function to the new set of input values.\n4. Calculate the corresponding output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns. Focus on precision and accuracy in your calculations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding mathematical functions and pattern recognition.",
+            "after_examples": "Calculate the corresponding function output values for the following input values. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON."
+        },
+
+                
+        "plan_solve":
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples delimited below to understand the underlying pattern and infer the mathematical function that relates the input and the output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns, and apply this function to the new set of input values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition.",
+            "after_examples": "Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples and based on your theoretical knowledge. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" values. Do not include symbolic expression, variables, or formulas in JSON. Only inlcude final output value in JSON format. Lets first understand the problem and devise a plan to solve the problem. Then, lets carry out the plan (pay attention to calculation and common sense), solve the problem step by step..."
+
+        },
+
+        "COT" : 
+        {
+            "before_examples": "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns, and apply this function to the new set of input values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition.Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples and based on your theoretical knowledge. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON. ",
+            "after_examples": "Let us use step by step inductive reasoning <reasoning to get to the answer> .... \nTherefore, the function value for the given input is <function value>."
+
+        }
+
+        
+    },
+    
+    "user_hard_prompts":
+    {
+         
+        "baseline": "Calculate the corresponding function output values for the following input values.\n Provide the function output values in the given json format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Provide only the final values without any introduction. Do not include \"rad\" or \"degree\" in the output.",
+            
+            
+        "baseline_context" : "Understand and infer the mathematical function that relates the input and the output values from the examples given. \n Your goal is to calculate the function output values for the following input values. Use the mathematical function that you analyzed from the examples. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" values. Do not include symbolic expression, variables, or formulas in JSON.",
+        
+
+        "context" : "Calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values. \n Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+       
+
+        "context_goal" : "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values.\n Calculate the corresponding function output values for the following input values based on the mathematical function you inferred from the examples. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+       
+
+        "input_format" : "Your goal is to calculate the corresponding function values for the input values. The exact function type and the exact underlying mathematical function are complex and unknown. The examples are given in format: {\"role\": \"user\", \"content\": ---EXAMPLE <integer> Input = <input value>} {\"role\": \"assistant\", \"content\": Output = <output value>}. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values.\n Calculate the corresponding function output values for the following input values. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+       
+        
+        "input_format_gpt": "Your task is to calculate the output values corresponding to given input values based on an unknown and complex mathematical function. Examples will be provided in the following format:\n\n{\"role\": \"user\", \"content\": \"EXAMPLE <integer> Input = <input value>\"}\n{\"role\": \"assistant\", \"content\": \"Output = <output value>\"}\n\nUse these examples to infer the underlying pattern and deduce the mathematical relationship between the input and output values. Then, calculate the output values for the following input values and provide them in JSON format.\n\nThe output JSON should have the following structure:\n: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}.\nEnsure that:\n1. You do not include \"rad\" or \"degree\" in the final output values.\n2. You do not include any symbolic expressions, variables, or formulas in the JSON output.",
+       
+        
+        "uncertain" : "Your goal is to calculate the corresponding function values for the input values. The mathematical function is complex and unknown.  Use the examples that were provided in the format: \n\n{\"role\": \"user\", \"content\": \"EXAMPLE <integer> Input = <input value>\"}\n{\"role\": \"assistant\", \"content\": \"Output = <output value>\"} to understand the underlying pattern and infer the mathematical function that relates the input and the output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns, and apply this function to the new set of input values. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+        
+
+        "reinforce" : "Your goal is to calculate the corresponding function values for the input values. The mathematical function is complex and unknown. Use the examples given above to understand the underlying pattern and infer the mathematical function that relates the input and the output values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+        
+        
+        "reinforce_uncertain" : "Your goal is to calculate the corresponding function values for the input values. The function is complex and unknown. The examples were given in the format:\n{\"role\": \"user\", \"content\": \"EXAMPLE <integer> Input = <input value>\"}\n{\"role\": \"assistant\", \"content\": \"Output = <output value>\"}\n. Use the examples to infer a function that exhibits similar patterns, and apply this function to the new set of input values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition.  Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+
+        "breakdown_uncertain": "Provide the function output value of the given input by performing the following tasks step by step:\n1. Analyze the examples delimited below.\n2. Recognize the underlying pattern and infer the underlying mathematical function based on the input-output pair values from the examples.\n3. Apply this function to the new set of input values.\n4. Calculate the corresponding output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns. Focus on precision and accuracy in your calculations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding mathematical functions and pattern recognition.  Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+              
+        "plan_solve": "Calculate the corresponding function values for the input values. The mathematical function needed is complex and unknown, however there are series of input and output values that can give indication on the underlying mathematical function or the trend in the pattern. The examples are given in format: \n{\"role\": \"user\", \"content\": \"EXAMPLE <integer> Input = <input value>\"}\n{\"role\": \"assistant\", \"content\": \"Output = <output value>\"}.\nUse the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values. If the underlying mathematical function can't be exactly identified, use your knowledge to make an educated guess for a function that exhibits similar patterns, and apply this function to the new set of input values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" values. Lets first understand the problem and devise a plan to solve the problem. Then, lets carry out the plan (pay attention to calculation and common sense), solve the problem step by step...",
+
+        "cot_persona":"You are an AI model trained to perform regression tasks. Your goal is to calculate the corresponding function values for the input values. The exact function type and the exact underlying mathematical function are complex and unknown. The examples are given in format: {\"role\": \"user\", \"content\": ---EXAMPLE <integer> Input = <input value>} {\"role\": \"assistant\", \"content\": Output = <output value>}. Use the examples to understand the underlying pattern and infer the mathematical function that relates the input and the output values.\n Calculate the corresponding function output values for the following input values. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON.",
+
+        "COT" : "Your goal is to calculate the corresponding function values for the input values. The function type and mathematical equation are complex and unknown. Use the examples to understand the underlying pattern and infer a mathematical function that exhibits similar patterns.  Apply this function to the new set of input values. Focus on precision and accuracy in your calculations and explanations. Remember, the quality of your inference and calculations is crucial for our continuous improvement in understanding complex mathematical functions and pattern recognition. Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON. Let us use step by step inductive reasoning <reasoning to get to the answer> .... \nTherefore, the function value for the given input is <function value>.",
+
+        "sequence": "Calculate the corresponding function values for the input. The mathematical function needed is complex in nature and unknown. However, there are sereis of input-output value pair that are produced from the same unknown and complex function. These examples are above in the format: \n{\"role\": \"user\", \"content\": \"EXAMPLE <integer> Input = <input value>\"}\n{\"role\": \"assistant\", \"content\": \"Output = <output value>\"}.\n Use these examples to identify underlying patterns or trends between the given input-output pairs. Then, apply this inferred function to the new inputs. Focus on precision and accurary.  Provide the output values in JSON format: {\"1\": \"f(x)=y\", \"2\": \f(x)=y\", ...}. Do not include \"rad\" or \"degree\" in the final output values in JSON. Do not include symbolic expression, variables, or formulas in JSON. Let us use step by step inductive reasoning <reasoning to get to the answer> .... \nTherefore, the function value for the given input is <function value>."
+          
+    }
+}

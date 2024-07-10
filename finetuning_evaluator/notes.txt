@@ -1,0 +1,48 @@
+another way to load peft model is to use each of the files given
+
+from safetensors.torch import load_file
+
+
+lora_config = os.path.join(config["checkpoint_dir"], "adapter_config.json")
+adapter_weights = os.path.join(config["checkpoint_dir"], "adapter_model.safetensors")
+
+#lora_args = LoraConfig.from_json_file(lora_config)
+with open(lora_config, 'r') as f:
+    lora_args = json.load(f)
+
+expected_args = LoraConfig.__init__.__code__.co_varnames
+filtered_lora_args = {k: v for k, v in lora_args.items() if k in expected_args}
+
+lora_config = LoraConfig(**filtered_lora_args)
+peft_model = get_peft_model(base_model, lora_config)
+state_dic = load_file(adapter_weights)
+print(state_dic)
+peft_model.load_state_dict(state_dic, strict=False)
+
+peft_model.eval() 
+
+then to evaluate it with the simple PeftModel.from_pretrained(basemodel, directory)
+# Compare architectures
+def compare_architectures(model1, model2):
+    return type(model1) == type(model2)
+
+# Compare weights
+def compare_weights(model1, model2):
+    model1_state_dict = model1.state_dict()
+    model2_state_dict = model2.state_dict()
+    
+    for key in model1_state_dict.keys():
+        if key not in model2_state_dict:
+            print(f"Key {key} not found in model2 state_dict")
+            return False
+        if not torch.equal(model1_state_dict[key], model2_state_dict[key]):
+            print(f"Weights for {key} are different")
+            return False
+    
+    return True
+
+print("Comparing architectures:")
+print("PEFT model0 vs PEFT model:", compare_architectures(model, peft_model))
+
+print("Comparing weights:")
+print("PEFT model0 vs PEFT model:", compare_weights(model, peft_model))
