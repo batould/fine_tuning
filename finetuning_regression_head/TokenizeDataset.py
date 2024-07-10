@@ -8,7 +8,7 @@ import torch
 access_token = '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'
 login(token=access_token)
 
-class TokenizeDataset():
+class TokenizeMaskDataset():
     
     def __init__(self, tokenizer) :        
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

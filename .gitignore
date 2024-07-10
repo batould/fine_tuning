@@ -3,5 +3,8 @@ Notes on Experimental Results.docx
 papers_citation
 finetuning_evaluator/test_dataset.csv
 finetuning_evaluator/few_shot.csv
+finetuning_preprocessor/input
+finetuning_preprocessor/output
+finetuning_trainer/output
 generate_data
 finetuning_vs-few-shot.xlsx
