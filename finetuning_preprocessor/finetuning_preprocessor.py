@@ -30,10 +30,10 @@ class FinetuningPreprocessor():
         if self._config["few_shot"]:
             input_dir = self._config["evaluate_dir"]
             test_data       = self._load_data(self._config["test_data_file_name"], input_dir)
-            few_shot_data       = self._load_data(self._config["few_shot_data_file_name"], input_dir)
+            #few_shot_data       = self._load_data(self._config["few_shot_data_file_name"], input_dir)
             unscaled_test_targets       = self._extract_targets(test_data)
-            few_shot_prompts = self._define_few_shot_prompts(few_shot_data)
-            test_prompts       = self._define_test_prompts(few_shot_prompts, test_data)
+            #few_shot_prompts = self._define_few_shot_prompts(few_shot_data)
+            test_prompts       = self._define_test_prompts(test_data)
             
         else:
             input_dir = self._config["input_dir"]
@@ -106,13 +106,16 @@ class FinetuningPreprocessor():
         return few_shot_prompt
     
     
-    def _define_test_prompts(self, few_shot_prompt, test_data):
+    def _define_test_prompts(self, test_data, few_shot_prompt=None):
         test_prompts = self._define_prompts(test_data)
-        final_test_prompt = []
-        for test_prompt in  test_prompts:
-            final_test_prompt.append([few_shot_prompt,test_prompt])
-        return final_test_prompt
-        
+        if few_shot_prompt:
+            final_test_prompt = []
+            for test_prompt in  test_prompts:
+                final_test_prompt.append([few_shot_prompt,test_prompt])
+            return final_test_prompt
+        else: 
+            return test_prompts
+            
 
 
     def _combine_prompts_and_targets(self, prompts, targets):
