@@ -6,7 +6,7 @@ from huggingface_hub import login
 import random
 from torch.utils.data import DataLoader
 import torch
-from configurations import _set_huggingface_config
+from finetuning_preprocessor.configurations import _set_huggingface_config
 import re
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 import os

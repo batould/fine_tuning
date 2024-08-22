@@ -8,3 +8,8 @@ finetuning_preprocessor/output
 finetuning_trainer/output
 generate_data
 finetuning_vs-few-shot.xlsx
+*.csv
+.csv
+*.txt
+*.pickle
+

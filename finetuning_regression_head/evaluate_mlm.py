@@ -1,6 +1,6 @@
 from LlamaRegression import LlamaForMaskedLLM
 from transformers import LlamaTokenizer, BitsAndBytesConfig
-from configurations import _set_huggingface_config
+from finetuning_preprocessor.configurations import _set_huggingface_config
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch

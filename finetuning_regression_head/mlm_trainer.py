@@ -5,7 +5,7 @@ from LlamaRegression import LlamaForMaskedLLM
 from huggingface_hub import login
 from torch.utils.data import DataLoader
 import torch
-from configurations import _set_huggingface_config
+from finetuning_preprocessor.configurations import _set_huggingface_config
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 import os
 import csv
